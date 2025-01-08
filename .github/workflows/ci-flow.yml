@@ -8,20 +8,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: test_database
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-
     steps:
       # Step 1: Checkout repository
       - uses: actions/checkout@v4
@@ -35,41 +21,46 @@ jobs:
       # Step 3: Install dependencies
       - run: npm install
 
+      - name: Set database environment variables
+        run: |
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
+          echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
+          echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
+
+      # Step 5: Test database connection
+      - name: Test database connection
+        run: |
+          mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$DB_PASSWORD -e "USE $DB_NAME; SHOW TABLES;"
+
+
       - name: Run lint
         run: npm run eslint
 
-      # Step 4: Configure database environment
-      - name: Set database environment variables
-        run: |
-          echo "DB_HOST=127.0.0.1" >> $GITHUB_ENV
-          echo "DB_PORT=3306" >> $GITHUB_ENV
-          echo "DB_USER=root" >> $GITHUB_ENV
-          echo "DB_PASSWORD=root" >> $GITHUB_ENV
-          echo "DB_NAME=test_database" >> $GITHUB_ENV
-
-      # Step 5: Run tests
+      # Step 4: Run tests
       - name: Run tests
         run: npm test
 
-      # Step 6: Get application version
+      # Step 5: Get application version
       - name: Get application version
         run: |
           VERSION=$(node -e "console.log(require('./package.json').version)")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      # Step 7: Log in to Docker Hub
+      # Step 6: Log in to Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Step 8: Build Docker image
+      # Step 7: Build Docker image
       - name: Build Docker image
         run: |
           docker build -t heilrose/backend-test:${{ env.VERSION }} .
 
-      # Step 9: Push Docker image to Docker Hub
+      # Step 8: Push Docker image to Docker Hub
       - name: Push Docker image to Docker Hub
         run: |
           docker push heilrose/backend-test:${{ env.VERSION }}
