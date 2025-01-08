@@ -1,6 +1,6 @@
 services:
   backend-api:
-    image: heilrose/backend-agronect:1.1.0 # Gunakan tag yang sesuai
+    image: heilrose/backend-agronect:${VERSION} # Gunakan tag yang sesuai
     ports:
       - "3000:3000" # Sesuaikan dengan port aplikasi Anda
     env_file:
