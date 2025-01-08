@@ -12,6 +12,7 @@ dotenv.config();
 
 const signUp = async (req, res) => {
   const { body } = req;
+  console.log("Request body:", body);
   const user_id = Math.random().toString(36).substring(2, 10);
   // console.log(user_id);
   const dates = new Date();
@@ -25,7 +26,7 @@ const signUp = async (req, res) => {
       });
     }
     const hashedPassword = await hashPassword(body.password);
-    const [data] = await signupAuthModel(body, user_id, dates, hashedPassword);
+    await signupAuthModel(body, user_id, dates, hashedPassword);
 
     const responseData = { ...body };
     delete responseData.password;
