@@ -19,6 +19,8 @@ export function createApp() {
     res.send("Hello this is Agronect Web Services ASIK");
   });
 
+  app.get("/favicon.ico", (req, res) => res.status(204).end());
+
   // Authentication Routes
   app.use(authenticationRoute);
 
@@ -28,7 +30,7 @@ export function createApp() {
   });
 
   // Error Handling Middleware
-  app.use((err, req, res) => {
+  app.use((err, req, res,_next) => {
     const { status = 500, message } = err;
     res.status(status).json({ error: { status, message } });
   });

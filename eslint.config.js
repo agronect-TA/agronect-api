@@ -15,6 +15,9 @@ export default [
   pluginJs.configs.recommended,
   {
     plugins: { jest: pluginJest },
-    rules: pluginJest.configs.recommended.rules,
+    rules: {
+      ...pluginJest.configs.recommended.rules,
+      "no-unused-vars": ["error", { argsIgnorePattern: "^_" }], // Tambahkan aturan ini
+    },
   },
 ];

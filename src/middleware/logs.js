@@ -21,9 +21,20 @@ const logMiddleware = (req, res, next) => {
       timestamp: new Date().toISOString(),
     };
 
-    // Ambil hanya pesan dari body respons jika error
-    const responseBody = typeof res.body === "string" ? JSON.parse(res.body) : res.body;
-    const errorMessage = responseBody?.error?.message || responseBody?.message || "Unknown error";
+    // Periksa apakah body respons adalah JSON yang valid
+    let responseBody;
+    try {
+      responseBody =
+        typeof res.body === "string" && res.body.trim().startsWith("{")
+          ? JSON.parse(res.body)
+          : res.body;
+    // eslint-disable-next-line no-unused-vars
+    } catch (error) {
+      responseBody = res.body; // Jika parsing gagal, gunakan body asli
+    }
+
+    const errorMessage =
+      responseBody?.error?.message || responseBody?.message || "Unknown error";
 
     if (res.statusCode >= 400) {
       logger.error({
