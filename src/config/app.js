@@ -5,7 +5,7 @@ import logs from "../middleware/logs.js";
 import authenticationRoute from "../routes/authenticationRoute.js";
 
 export function createApp() {
-  dotenv.config(); // Load environment variables
+  dotenv.config();
 
   const app = express();
 
@@ -13,27 +13,30 @@ export function createApp() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(logs);
-
   // Root Route
   app.get("/", (req, res) => {
     res.send("Hello this is Agronect Web Services ASIK");
   });
 
-  app.get("/favicon.ico", (req, res) => res.status(204).end());
-
   // Authentication Routes
   app.use(authenticationRoute);
 
-  // Error Handling for Undefined Routes
+  // Error Handling untuk Route yang Tidak Ditemukan
   app.use((req, res, next) => {
-    next(createError.NotFound("Tidak Ditemukan"));
+    next(createError.NotFound("Tidak Ditemukan")); // Lanjutkan ke middleware error handling
   });
 
-  // Error Handling Middleware
-  app.use((err, req, res,_next) => {
+  // Middleware Error Handling
+  app.use((err, req, res, _next) => {
     const { status = 500, message } = err;
-    res.status(status).json({ error: { status, message } });
-  });
 
-  return app; // Return the app instance
+    // Kirim respons error
+    res.status(status).json({
+      error: {
+        status,
+        message: message || "Internal Server Error",
+      },
+    });
+  });
+  return app;
 }
