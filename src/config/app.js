@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import createError from "http-errors";
 import logs from "../middleware/logs.js";
 import authenticationRoute from "../routes/authenticationRoute.js";
+import usersRoute from "../routes/usersRoute.js";
 
 export function createApp() {
   dotenv.config();
@@ -20,6 +21,7 @@ export function createApp() {
 
   // Authentication Routes
   app.use(authenticationRoute);
+  app.use(usersRoute);
 
   // Error Handling untuk Route yang Tidak Ditemukan
   app.use((req, res, next) => {
