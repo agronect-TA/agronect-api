@@ -13,7 +13,7 @@ import {
 } from "../middleware/upload.js";
 
 const getUserById = async (req, res) => {
-  const { userId } = req.params.id;
+  const userId = req.params.id;
   try {
     const rows = await getUserByIdModel(userId);
 
@@ -74,18 +74,18 @@ const changePassword = async (req, res) => {
 
     const user = rows[0];
 
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        status: "failed",
+        message: "New password and confirm password do not match",
+      });
+    }
+
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) {
       return res.status(400).json({
         status: "failed",
         message: "Old password is incorrect",
-      });
-    }
-
-    if (newPassword !== confirmPassword) {
-      return res.status(400).json({
-        status: "failed",
-        message: "New password and confirm password do not match",
       });
     }
 
