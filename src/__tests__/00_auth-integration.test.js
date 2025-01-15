@@ -3,6 +3,9 @@ import request from "supertest";
 import { createApp } from "../config/app.js";
 import dbPool from "../config/connection.js";
 
+import dotenv from "dotenv";
+dotenv.config();
+
 describe("Authentication Integration Tests", () => {
   let app;
 

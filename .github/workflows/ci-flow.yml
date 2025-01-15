@@ -34,13 +34,14 @@ jobs:
       # Step 5: Test database connection
       - name: Test database connection
         run: |
-          mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$DB_PASSWORD -e "USE $DB_NAME; SHOW TABLES;"
+          mysql -h $PROD_DB_HOST -P $PROD_DB_PORT -u $PROD_DB_USER -p$PROD_DB_PASSWORD -e "USE $PROD_DB_NAME; SHOW TABLES;"
         env:
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_NAME: ${{ secrets.DB_NAME }}
+          NODE_ENV: production
+          PROD_DB_HOST: ${{ secrets.PROD_DB_HOST }}
+          PROD_DB_PORT: ${{ secrets.PROD_DB_PORT }}
+          PROD_DB_USER: ${{ secrets.PROD_DB_USER }}
+          PROD_DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+          PROD_DB_NAME: ${{ secrets.PROD_DB_NAME }}
       - name: Run lint
         run: npm run eslint
 
