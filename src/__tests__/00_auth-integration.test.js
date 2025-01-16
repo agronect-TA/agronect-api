@@ -3,6 +3,8 @@ import request from "supertest";
 import { createApp } from "../config/app.js";
 import dbPool from "../config/connection.js";
 
+import dotenv from "dotenv";
+dotenv.config();
 
 describe("Authentication Integration Tests", () => {
   let app;
@@ -16,7 +18,7 @@ describe("Authentication Integration Tests", () => {
     await dbPool.execute("DELETE FROM user WHERE email = ?", [
       "testuser@example.com",
     ]);
-    dbPool.end();
+    await dbPool.end();
   });
 
   describe("POST /signup", () => {
@@ -60,7 +62,6 @@ describe("Authentication Integration Tests", () => {
 
       console.log(response.body);
       console.log(response.status);
-      
 
       expect(response.status).toBe(200);
       expect(response.body.status).toBe("success");
