@@ -16,12 +16,12 @@ describe("User Management Integration Tests", () => {
     // Buat akun dummy untuk pengujian
     await request(app).post("/signup").send({
       name: "Test User",
-      email: "testuser@example.com",
+      email: "testuser2@example.com",
       password: "Password123",
     });
 
     const loginResponse = await request(app).post("/signin").send({
-      email: "testuser@example.com",
+      email: "testuser2@example.com",
       password: "Password123",
     });
 
@@ -31,7 +31,7 @@ describe("User Management Integration Tests", () => {
 
   afterAll(async () => {
     await dbPool.execute("DELETE FROM user WHERE email = ?", [
-      "testuser@example.com",
+      "testuser2@example.com",
     ]);
     await dbPool.end();
   });
@@ -44,7 +44,7 @@ describe("User Management Integration Tests", () => {
 
       expect(response.status).toBe(200);
       expect(response.body.status).toBe("success");
-      expect(response.body.data.email).toBe("testuser@example.com");
+      expect(response.body.data.email).toBe("testuser2@example.com");
     });
   });
 
@@ -90,7 +90,7 @@ describe("User Management Integration Tests", () => {
       expect(response.body.message).toBe("Password updated successfully");
 
       const loginResponse = await request(app).post("/signin").send({
-        email: "testuser@example.com",
+        email: "testuser2@example.com",
         password: "NewPassword123",
       });
 
