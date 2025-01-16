@@ -15,8 +15,8 @@ describe("Authentication Integration Tests", () => {
 
   afterAll(async () => {
     // Clean up database and close pool connection
-    await dbPool.execute("DELETE FROM user WHERE email LIKE ?", [
-      "%example.com",
+    await dbPool.execute("DELETE FROM user WHERE email = ?", [
+      "testuser@example.com",
     ]);
     await dbPool.end();
   });
