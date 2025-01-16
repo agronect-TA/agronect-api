@@ -42,16 +42,18 @@ jobs:
           PROD_DB_USER: ${{ secrets.PROD_DB_USER }}
           PROD_DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
           PROD_DB_NAME: ${{ secrets.PROD_DB_NAME }}
-          SPACES_ACCESS_KEY: ${{ secrets.SPACES_ACCESS_KEY }}
-          SPACES_SECRET_KEY: ${{ secrets.SPACES_SECRET_KEY }}
-          SPACES_BUCKET_NAME: ${{ secrets.SPACES_BUCKET_NAME }}
-          SPACES_ENDPOINT: ${{ secrets.SPACES_ENDPOINT }}
+
       - name: Run lint
         run: npm run eslint
 
       # Step 4: Run tests
       - name: Run tests
         run: npm test
+        env:
+          SPACES_ACCESS_KEY: ${{ secrets.SPACES_ACCESS_KEY }}
+          SPACES_SECRET_KEY: ${{ secrets.SPACES_SECRET_KEY }}
+          SPACES_BUCKET_NAME: ${{ secrets.SPACES_BUCKET_NAME }}
+          SPACES_ENDPOINT: ${{ secrets.SPACES_ENDPOINT }}
 
       # Step 5: Get application version
       - name: Get application version
