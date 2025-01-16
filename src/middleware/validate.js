@@ -15,7 +15,7 @@ const validate = (schema) => (req, res, next) => {
     });
     res.status(400).json({
       code: 400,
-      status: "BAD REQUEST",
+      status: "failed",
       message: errorMessages,
       data: null,
     });
