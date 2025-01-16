@@ -221,11 +221,13 @@ describe("User Management API", () => {
     });
   });
 
-  // Test updateUser success
+  // Test updateUser success with unique email validation
   test("should update user data and return the updated user (updateUser)", async () => {
     req.params = { id: "1" };
     req.body = { name: "New Name", email: "newemail@example.com" };
     req.file = null; // Simulate no file uploaded
+
+    // Mock data for the user being updated
     getUserByIdModel.mockResolvedValue([
       {
         user_id: "1",
@@ -234,7 +236,16 @@ describe("User Management API", () => {
         photoProfileUrl: "oldPhotoUrl",
       },
     ]);
+
+    // Mock data for all users to validate unique email
+    getAllUsersModel.mockResolvedValue([
+      { user_id: "1", email: "oldemail@example.com" },
+      { user_id: "2", email: "existingemail@example.com" },
+    ]);
+
     updateUserModel.mockResolvedValue({ affectedRows: 1 });
+
+    // Mock updated user data
     getUserByIdModel.mockResolvedValue([
       {
         user_id: "1",
@@ -246,6 +257,7 @@ describe("User Management API", () => {
 
     await updateUser(req, res);
 
+    expect(getAllUsersModel).toHaveBeenCalled(); // Ensure email validation is called
     expect(updateUserModel).toHaveBeenCalledWith("1", {
       name: "New Name",
       email: "newemail@example.com",
@@ -264,6 +276,37 @@ describe("User Management API", () => {
     });
   });
 
+  // Test updateUser email already used
+  test("should return 400 if email is already used by another user (updateUser)", async () => {
+    req.params = { id: "1" };
+    req.body = { name: "New Name", email: "existingemail@example.com" };
+    req.file = null;
+
+    // Mock user being updated
+    getUserByIdModel.mockResolvedValue([
+      {
+        user_id: "1",
+        name: "Old Name",
+        email: "oldemail@example.com",
+        photoProfileUrl: "oldPhotoUrl",
+      },
+    ]);
+
+    // Mock all users for email validation
+    getAllUsersModel.mockResolvedValue([
+      { user_id: "1", email: "oldemail@example.com" },
+      { user_id: "2", email: "existingemail@example.com" },
+    ]);
+
+    await updateUser(req, res);
+
+    expect(getAllUsersModel).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      status: "failed",
+      message: "Email is already used by another user",
+    });
+  });
   describe("uploadProfilePhotoToSpaces", () => {
     test("should upload profile photo and return URL", async () => {
       req.file = { buffer: Buffer.from("fake-file"), mimetype: "image/png" };

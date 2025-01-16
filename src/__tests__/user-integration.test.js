@@ -47,6 +47,17 @@ describe("User Management Integration Tests", () => {
       expect(response.body.data.email).toBe("testuser2@example.com");
     });
   });
+  describe("GET /users/:id (not found)", () => {
+    it("should return 404 if user ID does not exist", async () => {
+      const response = await request(app)
+        .get(`/users/99999`) // ID yang tidak ada
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.status).toBe("failed");
+      expect(response.body.message).toBe("User not found");
+    });
+  });
 
   describe("GET /users/", () => {
     it("should return all users", async () => {
@@ -71,6 +82,33 @@ describe("User Management Integration Tests", () => {
       expect(response.status).toBe(200);
       expect(response.body.status).toBe("success");
       expect(response.body.dataUpdate.name).toBe("Updated User");
+    });
+  });
+  describe("PUT /users/update-users/:id (email validation)", () => {
+    it("should return 400 if email is already used by another user", async () => {
+      // Buat user baru untuk uji coba validasi email
+      await request(app).post("/signup").send({
+        name: "Another User",
+        email: "anotheruser@example.com",
+        password: "Password123",
+      });
+
+      const response = await request(app)
+        .put(`/users/update-users/${testUserId}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .field("name", "Updated User")
+        .field("email", "anotheruser@example.com"); // Email user lain
+
+      expect(response.status).toBe(400);
+      expect(response.body.status).toBe("failed");
+      expect(response.body.message).toBe(
+        "Email is already used by another user"
+      );
+
+      // Cleanup user baru
+      await dbPool.execute("DELETE FROM user WHERE email = ?", [
+        "anotheruser@example.com",
+      ]);
     });
   });
 

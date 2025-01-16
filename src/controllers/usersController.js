@@ -136,6 +136,21 @@ const updateUser = async (req, res) => {
       }
     }
 
+    // Check if the new email is already used by another user
+    if (email) {
+      const emailCheckRows = await getAllUsersModel(); // Retrieve all users
+      const isEmailUsed = emailCheckRows.some(
+        (user) => user.email === email && user.user_id !== parseInt(userId)
+      );
+
+      if (isEmailUsed) {
+        return res.status(400).json({
+          status: "failed",
+          message: "Email is already used by another user",
+        });
+      }
+    }
+
     // Update user data
     const updates = {};
     if (name) {
