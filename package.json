@@ -1,6 +1,6 @@
 {
   "name": "backend-api",
-  "version": "2.2.1",
+  "version": "3.0.0",
   "description": "Backend API untuk aplikasi penyakit tanaman",
   "main": "server.js",
   "type": "module",
@@ -26,6 +26,7 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.11.4",
+    "prom-client": "^13.2.0",
     "winston": "^3.17.0"
   },
   "devDependencies": {
