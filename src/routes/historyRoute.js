@@ -1,5 +1,4 @@
 import express from "express";
-import auth from "../middleware/authentication.js";
 import {
   getAllHistorys,
   getHistoryById,
@@ -11,7 +10,7 @@ const router = express.Router();
 
 // GET DATA
 router.get("/history", getAllHistorys);
-router.get("/history/users/:id_pred", auth, getHistoryById);
+router.get("/history/users/:id_pred", getHistoryById);
 // Delete DATA
 
 export default router;

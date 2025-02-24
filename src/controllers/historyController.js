@@ -28,11 +28,12 @@ const getAllHistorys = async (req, res) => {
 };
 
 const getHistoryById = async (req, res) => {
-  const { id } = req.params;
+  const { id_pred } = req.params;
 
   try {
-    const history = await getHistoryByIdModel(id);
-    if (!history) {
+    const history = await getHistoryByIdModel(id_pred);
+    if (!history || history.length === 0) {
+      // Tambahkan pengecekan length
       return res.status(404).json({
         status: "failed",
         message: "History not found",
