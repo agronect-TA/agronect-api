@@ -4,12 +4,20 @@ import createError from "http-errors";
 import logs from "../middleware/logs.js";
 import authenticationRoute from "../routes/authenticationRoute.js";
 import usersRoute from "../routes/usersRoute.js";
+import historyRoute from "../routes/historyRoute.js";
+import {
+  metricsMiddleware,
+  metricsEndpoint,
+} from "../middleware/prometheus.js";
 
 export function createApp() {
   dotenv.config();
 
   const app = express();
 
+  app.use(metricsMiddleware);
+
+  app.get("/metrics", metricsEndpoint);
   // Middleware
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
@@ -22,6 +30,7 @@ export function createApp() {
   // Authentication Routes
   app.use(authenticationRoute);
   app.use(usersRoute);
+  app.use(historyRoute);
 
   // Error Handling untuk Route yang Tidak Ditemukan
   app.use((req, res, next) => {

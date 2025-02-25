@@ -1,7 +1,7 @@
 import { createApp } from "./config/app.js";
 
 const app = createApp(); // Create app instance
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 // Start server
 app.listen(port, () => {
