@@ -28,11 +28,11 @@ const getAllHistoryByUserIdModel = async (user_id) => {
 };
 
 const deleteHistoryModel = async (id_pred) => {
-  const [rows] = await dbPool.execute(
+  const [result] = await dbPool.execute(
     "DELETE FROM predictions WHERE id_pred = ?",
     [id_pred]
   );
-  return rows;
+  return result;
 };
 
 export {

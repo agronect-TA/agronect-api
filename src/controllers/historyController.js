@@ -8,7 +8,7 @@ import {
 const getAllHistorys = async (req, res) => {
   try {
     const rows = await getAllHistoryModel();
-    if (!rows || rows.length === 0) {
+    if (!rows.length) {
       return res.status(404).json({
         status: "failed",
         message: "No history found",
@@ -34,7 +34,7 @@ const getHistoryById = async (req, res) => {
 
   try {
     const history = await getHistoryByIdModel(id_pred);
-    if (!history || history.length === 0) {
+    if (!history.length) {
       // Tambahkan pengecekan length
       return res.status(404).json({
         status: "failed",
@@ -61,7 +61,7 @@ const getHistoryByUserId = async (req, res) => {
   try {
     const { user_id } = req.params;
     const rows = await getAllHistoryByUserIdModel(user_id);
-    if (!rows || rows.length === 0) {
+    if (!rows.length) {
       return res.status(404).json({
         status: "failed",
         message: "No history found for this user",

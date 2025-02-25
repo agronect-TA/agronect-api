@@ -46,7 +46,7 @@ describe("History Management Integration Tests", () => {
   describe("GET /history/:id", () => {
     it("should return history details for a valid history ID", async () => {
       const response = await request(app)
-        .get(`/history/users/${testHistoryId}`)
+        .get(`/history/${testHistoryId}`)
         .set("Authorization", `Bearer ${accessToken}`);
 
       console.log(response.body); // Debugging line
@@ -58,7 +58,7 @@ describe("History Management Integration Tests", () => {
 
     it("should return 404 if history ID does not exist", async () => {
       const response = await request(app)
-        .get(`/history/users/99999`)
+        .get(`/history/99999`)
         .set("Authorization", `Bearer ${accessToken}`);
 
       expect(response.status).toBe(404);
@@ -82,7 +82,7 @@ describe("History Management Integration Tests", () => {
   describe("GET /history/:user_id", () => {
     it("should return history for a valid user_id", async () => {
       const response = await request(app)
-        .get(`/history/asyfn5c6`)
+        .get(`/history/users/asyfn5c6`)
         .set("Authorization", `Bearer ${accessToken}`);
 
       expect(response.status).toBe(200);
@@ -92,7 +92,7 @@ describe("History Management Integration Tests", () => {
 
     it("should return 404 if no history found for user_id", async () => {
       const response = await request(app)
-        .get(`/history/unknown_user`)
+        .get(`/history/users/unknown_user`)
         .set("Authorization", `Bearer ${accessToken}`);
 
       expect(response.status).toBe(404);
@@ -104,7 +104,7 @@ describe("History Management Integration Tests", () => {
   describe("DELETE /history/users/:id_pred", () => {
     it("should delete history for a valid id_pred", async () => {
       const response = await request(app)
-        .delete(`/history/users/${testHistoryId}`)
+        .delete(`/history/${testHistoryId}`)
         .set("Authorization", `Bearer ${accessToken}`);
 
       expect(response.status).toBe(200);
@@ -114,7 +114,7 @@ describe("History Management Integration Tests", () => {
 
     it("should return 404 if history not found or no delete performed", async () => {
       const response = await request(app)
-        .delete(`/history/users/99999`)
+        .delete(`/history/99999`)
         .set("Authorization", `Bearer ${accessToken}`);
 
       expect(response.status).toBe(404);
