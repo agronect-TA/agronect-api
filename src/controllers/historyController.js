@@ -1,6 +1,8 @@
 import {
   getAllHistoryModel,
   getHistoryByIdModel,
+  getAllHistoryByUserIdModel,
+  deleteHistoryModel,
 } from "../models/historyModel.js";
 
 const getAllHistorys = async (req, res) => {
@@ -55,4 +57,58 @@ const getHistoryById = async (req, res) => {
   }
 };
 
-export { getHistoryById, getAllHistorys };
+const getHistoryByUserId = async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const rows = await getAllHistoryByUserIdModel(user_id);
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({
+        status: "failed",
+        message: "No history found for this user",
+        dataHistoryUser: null,
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      message: "History found",
+      dataHistoryUser: rows,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "failed",
+      message: "Internal server error",
+      dataHistoryUser: null,
+    });
+  }
+};
+
+const deleteHistory = async (req, res) => {
+  const { id_pred } = req.params;
+  try {
+    const result = await deleteHistoryModel(id_pred);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "failed",
+        message: "History not found or no delete performed",
+        dataDelete: null,
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      message: "History deleted successfully",
+      dataDelete: {
+        id_pred,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "failed",
+      message: "Internal server error",
+      dataDelete: null,
+    });
+  }
+};
+
+export { getHistoryById, getAllHistorys, deleteHistory, getHistoryByUserId };

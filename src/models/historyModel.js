@@ -19,4 +19,25 @@ const getHistoryByIdModel = async (id_pred) => {
   return rows;
 };
 
-export { getHistoryByIdModel, getAllHistoryModel };
+const getAllHistoryByUserIdModel = async (user_id) => {
+  const [rows] = await dbPool.execute(
+    "SELECT id_pred, prediction, confidence, description, solution, user_id,plant_name,image_url FROM predictions WHERE user_id = ? ORDER BY created_at DESC",
+    [user_id]
+  );
+  return rows;
+};
+
+const deleteHistoryModel = async (id_pred) => {
+  const [rows] = await dbPool.execute(
+    "DELETE FROM predictions WHERE id_pred = ?",
+    [id_pred]
+  );
+  return rows;
+};
+
+export {
+  getHistoryByIdModel,
+  getAllHistoryModel,
+  deleteHistoryModel,
+  getAllHistoryByUserIdModel,
+};

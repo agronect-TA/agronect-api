@@ -78,4 +78,50 @@ describe("History Management Integration Tests", () => {
       expect(Array.isArray(response.body.dataHistory)).toBe(true);
     });
   });
+
+  describe("GET /history/:user_id", () => {
+    it("should return history for a valid user_id", async () => {
+      const response = await request(app)
+        .get(`/history/asyfn5c6`)
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.status).toBe("success");
+      expect(Array.isArray(response.body.dataHistoryUser)).toBe(true);
+    });
+
+    it("should return 404 if no history found for user_id", async () => {
+      const response = await request(app)
+        .get(`/history/unknown_user`)
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.status).toBe("failed");
+      expect(response.body.message).toBe("No history found for this user");
+    });
+  });
+
+  describe("DELETE /history/users/:id_pred", () => {
+    it("should delete history for a valid id_pred", async () => {
+      const response = await request(app)
+        .delete(`/history/users/${testHistoryId}`)
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.status).toBe("success");
+      expect(response.body.message).toBe("History deleted successfully");
+    });
+
+    it("should return 404 if history not found or no delete performed", async () => {
+      const response = await request(app)
+        .delete(`/history/users/99999`)
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.status).toBe("failed");
+      expect(response.body.message).toBe(
+        "History not found or no delete performed"
+      );
+    });
+  });
 });
