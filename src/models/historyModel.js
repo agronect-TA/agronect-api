@@ -3,7 +3,7 @@ import dbPool from "../config/connection.js";
 // get history
 const getAllHistoryModel = async () => {
   const [rows] = await dbPool.execute(
-    "SELECT id_pred, prediction, confidence, description, solution, user_id, plant_name, image_url FROM predictions ORDER BY created_at DESC"
+    "SELECT id_pred, prediction, confidence, description, solution, user_id, plant_name, image_url,image FROM predictions ORDER BY created_at DESC"
   );
   return rows.map((row) => ({
     ...row,
@@ -21,7 +21,7 @@ const getHistoryByIdModel = async (id_pred) => {
 
 const getAllHistoryByUserIdModel = async (user_id) => {
   const [rows] = await dbPool.execute(
-    "SELECT id_pred, prediction, confidence, description, solution, user_id,plant_name,image_url FROM predictions WHERE user_id = ? ORDER BY created_at DESC",
+    "SELECT id_pred, prediction, confidence, description, solution, user_id,plant_name,image_url,image FROM predictions WHERE user_id = ? ORDER BY created_at DESC",
     [user_id]
   );
   return rows;
