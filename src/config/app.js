@@ -5,6 +5,7 @@ import logs from "../middleware/logs.js";
 import authenticationRoute from "../routes/authenticationRoute.js";
 import usersRoute from "../routes/usersRoute.js";
 import historyRoute from "../routes/historyRoute.js";
+import sharingRoute from "../routes/sharingRoute.js";
 import {
   metricsMiddleware,
   metricsEndpoint,
@@ -31,6 +32,7 @@ export function createApp() {
   app.use(authenticationRoute);
   app.use(usersRoute);
   app.use(historyRoute);
+  app.use(sharingRoute);
 
   // Error Handling untuk Route yang Tidak Ditemukan
   app.use((req, res, next) => {

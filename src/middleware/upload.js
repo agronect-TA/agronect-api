@@ -57,6 +57,39 @@ const uploadProfilePhotoToSpaces = async (file) => {
   }
 };
 
+const uploadSharingImageToSpaces = async (file) => {
+  try {
+    // Pastikan file valid
+    if (!file) {
+      throw new Error("No file provided for upload.");
+    }
+
+    const uniqueCode = Math.random().toString(36).substring(2, 10);
+    const fileName = `Sharing_Image/sharing-image-${uniqueCode}`;
+    const params = {
+      Bucket: bucketName,
+      Key: fileName,
+      Body: file.buffer,
+      ACL: "public-read",
+      ContentType: file.mimetype,
+    };
+
+    const command = new PutObjectCommand(params);
+    await s3.send(command);
+
+    // Buat URL publik
+    const publicUrl = `https://${bucketName}.${process.env.SPACES_ENDPOINT.replace(
+      "https://",
+      ""
+    )}/${fileName}`;
+
+    return publicUrl;
+  } catch (err) {
+    console.error("Error uploading sharing image to Spaces:", err);
+    throw err;
+  }
+};
+
 const deleteFileFromSpaces = async (publicUrl) => {
   try {
     // Ekstrak file path dari URL
@@ -103,4 +136,9 @@ const deleteFileFromSpaces = async (publicUrl) => {
   }
 };
 
-export { upload, uploadProfilePhotoToSpaces, deleteFileFromSpaces };
+export {
+  upload,
+  uploadProfilePhotoToSpaces,
+  deleteFileFromSpaces,
+  uploadSharingImageToSpaces,
+};
