@@ -109,4 +109,38 @@ describe("Sharing API Integration Tests", () => {
     expect(res.status).toBe(404);
     expect(res.body.message).toBe("No sharing found for this user");
   });
+
+  test("PUT /sharing/:id - should update sharing content", async () => {
+    const postRes = await request(app)
+      .post("/sharing")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({ content: "Test post for update" });
+
+    testSharingId = postRes.body.dataPost.sharing_id;
+
+    const res = await request(app)
+      .put(`/sharing/${testSharingId}`)
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({ content: "Updated content" });
+
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe("success");
+    expect(res.body.dataUpdate.content).toBe("Updated content");
+  });
+
+  test("DELETE /sharing/:id - should delete sharing", async () => {
+    const postRes = await request(app)
+      .post("/sharing")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({ content: "Test post for delete" });
+
+    testSharingId = postRes.body.dataPost.sharing_id;
+
+    const res = await request(app)
+      .delete(`/sharing/${testSharingId}`)
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe("success");
+  });
 });

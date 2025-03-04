@@ -1,93 +1,130 @@
 import {
-  postSharing,
-  getAllSharing,
+  getSharingById,
+  getSharingByUserId,
+  updateSharing,
+  deleteSharing,
 } from "../controllers/sharingController.js";
 import {
-  postSharingModel,
-  getAllSharingModel,
-  getTotalSharingCount,
+  getSharingByIdModel,
+  getSharingByUserIdModel,
+  updateSharingModel,
+  deleteSharingModel,
 } from "../models/sharingModel.js";
-import jwt from "jsonwebtoken";
+import {
+  deleteFileFromSpaces,
+  uploadSharingImageToSpaces,
+} from "../middleware/upload.js";
 
 jest.mock("../models/sharingModel.js");
-jest.mock("jsonwebtoken");
+jest.mock("../middleware/upload.js");
 
-describe("Sharing Controller", () => {
-  afterEach(() => {
-    jest.clearAllMocks();
+describe("Sharing Controller Unit Tests", () => {
+  let req, res;
+
+  beforeEach(() => {
+    req = { params: {}, body: {}, file: null };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
   });
 
-  test("postSharing - should return 401 if no token provided", async () => {
-    const req = { headers: {}, body: { content: "Test content" } };
-    const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
-    await postSharing(req, res);
-    expect(res.status).toHaveBeenCalledWith(401);
+  test("getSharingById - should return sharing details", async () => {
+    const mockSharing = { sharing_id: "123", content: "Test content" };
+    getSharingByIdModel.mockResolvedValue(mockSharing);
+    req.params.sharing_id = "123";
+
+    await getSharingById(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
-      message: "Harap autentikasi terlebih dahulu",
+      status: "success",
+      message: "Sharing found",
+      data: mockSharing,
     });
   });
 
-  test("postSharing - should return 201 if post is successful", async () => {
-    const token = "valid.token.here";
-    jwt.verify.mockReturnValue({ id: "user1", name: "Test User" });
-    postSharingModel.mockResolvedValue();
+  test("getSharingById - should return 404 if not found", async () => {
+    getSharingByIdModel.mockResolvedValue(null);
+    req.params.sharing_id = "999";
 
-    const req = {
-      headers: { authorization: `Bearer ${token}` },
-      body: { content: "New post content" },
-    };
-    const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+    await getSharingById(req, res);
 
-    await postSharing(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        status: "success",
-        message: "Content shared successfully",
-      })
-    );
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ message: "Sharing not found" });
   });
 
-  test("postSharing - should return 500 if there is an error", async () => {
-    const token = "valid.token.here";
-    jwt.verify.mockReturnValue({ id: "user1", name: "Test User" });
-    postSharingModel.mockRejectedValue(new Error("Database error"));
+  test("getSharingByUserId - should return sharing list for a user", async () => {
+    const mockSharingList = [{ sharing_id: "123", content: "Test post" }];
+    getSharingByUserIdModel.mockResolvedValue(mockSharingList);
+    req.params.user_id = "user123";
 
-    const req = {
-      headers: { authorization: `Bearer ${token}` },
-      body: { content: "New post content" },
-    };
-    const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
-
-    await postSharing(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        status: "failed",
-        message: "Internal server error",
-      })
-    );
-  });
-
-  test("getAllSharing - should return paginated results", async () => {
-    getAllSharingModel.mockResolvedValue([
-      { sharing_id: "1", content: "Test" },
-    ]);
-    getTotalSharingCount.mockResolvedValue(1);
-
-    const req = { query: { page: "1", size: "10" } };
-    const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
-
-    await getAllSharing(req, res);
+    await getSharingByUserId(req, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        status: "success",
-        pagination: expect.any(Object),
-      })
-    );
+    expect(res.json).toHaveBeenCalledWith({
+      status: "success",
+      message: "Sharing found",
+      data: mockSharingList,
+    });
+  });
+
+  test("updateSharing - should update and return updated sharing", async () => {
+    const mockSharing = {
+      sharing_id: "123",
+      content: "Old content",
+      imgUrl: "old.jpg",
+    };
+    getSharingByIdModel.mockResolvedValue(mockSharing);
+    updateSharingModel.mockResolvedValue({ affectedRows: 1 });
+    deleteFileFromSpaces.mockResolvedValue();
+    uploadSharingImageToSpaces.mockResolvedValue("new.jpg");
+    req.params.sharing_id = "123";
+    req.body.content = "Updated content";
+    req.file = { buffer: "fakeBuffer" };
+
+    await updateSharing(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      status: "success",
+      message: "Sharing updated successfully",
+      dataUpdate: {
+        sharing_id: "123",
+        content: "Updated content",
+        imgUrl: "new.jpg",
+      },
+    });
+  });
+
+  test("deleteSharing - should delete sharing successfully", async () => {
+    const mockSharing = { sharing_id: "123", imgUrl: "old.jpg" };
+    getSharingByIdModel.mockResolvedValue(mockSharing);
+    deleteSharingModel.mockResolvedValue({ affectedRows: 1 });
+    deleteFileFromSpaces.mockResolvedValue();
+    req.params.sharing_id = "123";
+
+    await deleteSharing(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      status: "success",
+      message: "Sharing deleted successfully",
+      dataDelete: { sharing_id: "123" },
+    });
+  });
+
+  test("deleteSharing - should return 404 if sharing not found", async () => {
+    getSharingByIdModel.mockResolvedValue(null);
+    req.params.sharing_id = "999";
+
+    await deleteSharing(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({
+      status: "failed",
+      message: "Sharing not found",
+      dataDelete: null,
+    });
   });
 });

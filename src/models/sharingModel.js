@@ -38,10 +38,33 @@ const getSharingByUserIdModel = async (user_id) => {
   return rows;
 };
 
+const updateSharingModel = async (sharing_id, content, imgUrl) => {
+  const query = `
+        UPDATE sharing
+        SET content = ?, imgUrl = ?
+        WHERE sharing_id = ?
+    `;
+  const values = [content, imgUrl, sharing_id];
+
+  const [result] = await dbPool.execute(query, values);
+  return result;
+};
+
+const deleteSharingModel = async (sharing_id) => {
+  const query = `
+        DELETE FROM sharing
+        WHERE sharing_id = ?
+    `;
+
+  const [result] = await dbPool.execute(query, [sharing_id]);
+  return result;
+};
 export {
   getAllSharingModel,
   getTotalSharingCount,
   postSharingModel,
   getSharingByIdModel,
   getSharingByUserIdModel,
+  updateSharingModel,
+  deleteSharingModel,
 };

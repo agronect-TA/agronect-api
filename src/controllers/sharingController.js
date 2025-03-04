@@ -4,8 +4,13 @@ import {
   getTotalSharingCount,
   getSharingByIdModel,
   getSharingByUserIdModel,
+  deleteSharingModel,
+  updateSharingModel,
 } from "../models/sharingModel.js";
-import { uploadSharingImageToSpaces } from "../middleware/upload.js";
+import {
+  deleteFileFromSpaces,
+  uploadSharingImageToSpaces,
+} from "../middleware/upload.js";
 import jwt from "jsonwebtoken";
 
 const postSharing = async (req, res) => {
@@ -133,4 +138,115 @@ const getSharingByUserId = async (req, res) => {
   }
 };
 
-export { postSharing, getAllSharing, getSharingById, getSharingByUserId };
+const updateSharing = async (req, res) => {
+  const { sharing_id } = req.params;
+  const { content, imgUrl } = req.body;
+  try {
+    // Fetch the current sharing record
+    const existingSharing = await getSharingByIdModel(sharing_id);
+    if (!existingSharing) {
+      return res.status(404).json({
+        status: "failed",
+        message: "Sharing not found",
+        dataUpdate: null,
+      });
+    }
+
+    let updatedImgUrl = existingSharing.imgUrl;
+
+    // If imgUrl is explicitly set to null or no file is uploaded, delete the existing image
+    if (imgUrl === null || !req.file) {
+      if (updatedImgUrl) {
+        await deleteFileFromSpaces(updatedImgUrl);
+        updatedImgUrl = null;
+      }
+    } else if (req.file) {
+      // If a new file is uploaded, delete the old image and upload the new one
+      if (updatedImgUrl) {
+        await deleteFileFromSpaces(updatedImgUrl);
+      }
+      updatedImgUrl = await uploadSharingImageToSpaces(req.file);
+    }
+
+    const result = await updateSharingModel(sharing_id, content, updatedImgUrl);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "failed",
+        message: "Sharing not found or no update performed",
+        dataUpdate: null,
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Sharing updated successfully",
+      dataUpdate: {
+        sharing_id,
+        content,
+        imgUrl: updatedImgUrl,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "failed",
+      message: "Internal server error",
+      dataUpdate: null,
+    });
+  }
+};
+
+const deleteSharing = async (req, res) => {
+  const { sharing_id } = req.params;
+  try {
+    // Fetch the current sharing record
+    const existingSharing = await getSharingByIdModel(sharing_id);
+    if (!existingSharing) {
+      return res.status(404).json({
+        status: "failed",
+        message: "Sharing not found",
+        dataDelete: null,
+      });
+    }
+
+    // Delete the image from GCS if it exists
+    if (existingSharing.imgUrl) {
+      await deleteFileFromSpaces(existingSharing.imgUrl);
+    }
+
+    const result = await deleteSharingModel(sharing_id);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "failed",
+        message: "Sharing not found or no delete performed",
+        dataDelete: null,
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Sharing deleted successfully",
+      dataDelete: {
+        sharing_id,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "failed",
+      message: "Internal server error",
+      dataDelete: null,
+    });
+  }
+};
+
+export {
+  postSharing,
+  getAllSharing,
+  getSharingById,
+  getSharingByUserId,
+  updateSharing,
+  deleteSharing,
+};
