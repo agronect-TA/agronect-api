@@ -2,6 +2,8 @@ import {
   postSharingModel,
   getAllSharingModel,
   getTotalSharingCount,
+  getSharingByIdModel,
+  getSharingByUserIdModel,
 } from "../models/sharingModel.js";
 import { uploadSharingImageToSpaces } from "../middleware/upload.js";
 import jwt from "jsonwebtoken";
@@ -80,4 +82,55 @@ const getAllSharing = async (req, res) => {
   }
 };
 
-export { postSharing, getAllSharing };
+const getSharingById = async (req, res) => {
+  const { sharing_id } = req.params;
+
+  try {
+    const sharing = await getSharingByIdModel(sharing_id);
+
+    if (!sharing) {
+      return res.status(404).json({ message: "Sharing not found" });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Sharing found",
+      data: sharing,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "failed",
+      message: "Internal server error",
+      data: null,
+    });
+  }
+};
+
+const getSharingByUserId = async (req, res) => {
+  const { user_id } = req.params;
+
+  try {
+    const rows = await getSharingByUserIdModel(user_id);
+    if (!rows || rows.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No sharing found for this user" });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Sharing found",
+      data: rows,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "failed",
+      message: "Internal server error",
+      data: null,
+    });
+  }
+};
+
+export { postSharing, getAllSharing, getSharingById, getSharingByUserId };

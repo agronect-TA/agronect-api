@@ -22,4 +22,26 @@ const getTotalSharingCount = async () => {
   return rows[0].count;
 };
 
-export { getAllSharingModel, getTotalSharingCount, postSharingModel };
+const getSharingByIdModel = async (sharing_id) => {
+  const [rows] = await dbPool.execute(
+    "SELECT * FROM sharing WHERE sharing_id = ?",
+    [sharing_id]
+  );
+  return rows.length > 0 ? rows[0] : null;
+};
+
+const getSharingByUserIdModel = async (user_id) => {
+  const [rows] = await dbPool.execute(
+    "SELECT * FROM sharing WHERE user_id = ? ORDER BY created_at DESC",
+    [user_id]
+  );
+  return rows;
+};
+
+export {
+  getAllSharingModel,
+  getTotalSharingCount,
+  postSharingModel,
+  getSharingByIdModel,
+  getSharingByUserIdModel,
+};

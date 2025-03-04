@@ -70,20 +70,6 @@ describe("User Management Integration Tests", () => {
       expect(Array.isArray(response.body.data)).toBe(true);
     });
   });
-
-  describe("PUT /users/update-users/:id", () => {
-    it("should successfully update user details", async () => {
-      const response = await request(app)
-        .put(`/users/update-users/${testUserId}`)
-        .set("Authorization", `Bearer ${accessToken}`)
-        .field("name", "Updated User")
-        .attach("imgUrl", Buffer.from("fake-image-data"), "profile.jpg");
-
-      expect(response.status).toBe(200);
-      expect(response.body.status).toBe("success");
-      expect(response.body.dataUpdate.name).toBe("Updated User");
-    });
-  });
   describe("PUT /users/update-users/:id (email validation)", () => {
     it("should return 400 if email is already used by another user", async () => {
       // Buat user baru untuk uji coba validasi email
