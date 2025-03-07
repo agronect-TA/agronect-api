@@ -9,6 +9,7 @@ import {
   deleteSharing,
 } from "../controllers/sharingController.js";
 import { upload } from "../middleware/upload.js";
+import verifyOwnership from "../middleware/verifySharing.js";
 
 const router = express.Router();
 
@@ -19,9 +20,10 @@ router.get("/sharing/users/:user_id", auth, getSharingByUserId); // Add this rou
 router.put(
   "/sharing/:sharing_id",
   auth,
+  verifyOwnership,
   upload.single("imgUrl"),
   updateSharing
 );
-router.delete("/sharing/:sharing_id", auth, deleteSharing);
+router.delete("/sharing/:sharing_id", auth, verifyOwnership, deleteSharing);
 
 export default router;

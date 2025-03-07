@@ -154,14 +154,14 @@ const updateSharing = async (req, res) => {
 
     let updatedImgUrl = existingSharing.imgUrl;
 
-    // If imgUrl is explicitly set to null or no file is uploaded, delete the existing image
-    if (imgUrl === null || !req.file) {
+    // Hanya hapus jika imgUrl secara eksplisit dikirim sebagai null
+    if (imgUrl === null) {
       if (updatedImgUrl) {
         await deleteFileFromSpaces(updatedImgUrl);
         updatedImgUrl = null;
       }
     } else if (req.file) {
-      // If a new file is uploaded, delete the old image and upload the new one
+      // Jika ada file baru, hapus gambar lama lalu upload gambar baru
       if (updatedImgUrl) {
         await deleteFileFromSpaces(updatedImgUrl);
       }

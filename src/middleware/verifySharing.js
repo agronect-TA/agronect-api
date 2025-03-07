@@ -1,4 +1,4 @@
-import { getSharingByIdModel } from "../models/discussionModel.js";
+import { getSharingByIdModel } from "../models/sharingModel.js";
 
 const verifyOwnership = async (req, res, next) => {
   const { sharing_id } = req.params;
