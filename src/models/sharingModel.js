@@ -11,10 +11,19 @@ const postSharingModel = async (sharing_id, content, userId, name, imgUrl) => {
 };
 
 const getAllSharingModel = async (offset, limit) => {
-  return dbPool.query(
+  const [rows] = await dbPool.query(
     "SELECT * FROM sharing ORDER BY created_at DESC LIMIT ?, ?",
     [offset, limit]
   );
+
+  // Konversi Buffer ke String jika imgUrl masih Buffer
+  rows.forEach((row) => {
+    if (Buffer.isBuffer(row.imgUrl)) {
+      row.imgUrl = row.imgUrl.toString("utf-8");
+    }
+  });
+
+  return rows;
 };
 
 const getTotalSharingCount = async () => {
