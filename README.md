@@ -18,7 +18,7 @@
         }
         ```
 - **Response Berhasil:**
-    - **Status Code:** 200 OK
+    - **Status Code:** 201 Created
     - **Body:**
         ```json
         {
@@ -220,12 +220,46 @@
             "message": "error.message"
         }
         ```
+### **7. Mengubah Password Pengguna**
+- **Endpoint:** `/users/change-password/:user_id`
+- **Metode:** `PUT`
+- **Deskripsi:** Mengubah password pengguna. Pengguna harus menyertakan password lama (oldPassword), password baru (newPassword), dan konfirmasi password baru (confirmPassword).
+- **Format Request:**
+    - **Content-Type:** `application/json`
+    - **Headers:** `Authorization: Bearer <token>`
+    - **Parameter:** `user_id`
+    - **Body:**
+        ```json
+        {
+            "oldPassword": "TestingNew123",
+            "newPassword": "TestingNew234",
+            "confirmPassword": "TestingNew234"
+        }
+        ```
+- **Response Berhasil:**
+    - **Status Code:** 200 OK
+    - **Body:**
+        ```json
+        {
+            "status": "success",
+            "message": "Password updated successfully"
+        }
+        ```
+- **Response Error:**
+    - **Status Code:** 400 Bad Request
+    - **Body:**
+        ```json
+        {
+            "status": "failed",
+            "message": "Deskripsi kesalahan atau pesan error"
+        }
+        ```
 
 ---
 
 ## **Fitur Prediksi Penyakit Tanaman**
 
-### **7. Prediksi Penyakit Tanaman**
+### **8. Prediksi Penyakit Tanaman**
 - **Endpoint:** `/predict/<plant_name>`
 - **Metode:** `POST`
 - **Deskripsi:** Memprediksi penyakit pada tanaman berdasarkan gambar yang diunggah. Hanya menerima nama tanaman tertentu.
@@ -259,12 +293,142 @@
 
 ---
 
-## **Fitur Berbagi Konten**
+### **Fitur History**
 
-### **8. Menambahkan Postingan Baru**
+### **9. Mendapatkan Semua Riwayat**
+- **Endpoint:** `/history`
+- **Metode:** `GET`
+- **Deskripsi:** Mengambil daftar semua data riwayat prediksi penyakit tanaman.
+- **Format Request:**
+    - **Content-Type:** `application/json`
+    - **Headers:** `Authorization: Bearer <token>`
+- **Response Berhasil:**
+    - **Status Code:** 200 OK
+    - **Body:**
+        ```json
+        {
+            "status": "success",
+            "message": "History found",
+            "dataHistory": []
+        }
+        ```
+- **Response Error:**
+    - **Status Code:** 400 Bad Request
+    - **Body:**
+        ```json
+        {
+            "status": "failed",
+            "message": "Deskripsi kesalahan atau pesan error"
+        }
+        ```
+
+---
+
+### **10. Mendapatkan Riwayat Berdasarkan ID**
+- **Endpoint:** `/history/:id_pred`
+- **Metode:** `GET`
+- **Deskripsi:** Mengambil data riwayat berdasarkan `id_pred`. Hanya satu data yang akan ditampilkan sesuai ID tersebut.
+- **Format Request:**
+    - **Content-Type:** `application/json`
+    - **Headers:** `Authorization: Bearer <token>`
+    - **Parameter:** `id_pred`
+- **Response Berhasil:**
+    - **Status Code:** 200 OK
+    - **Body:**
+        ```json
+        {
+            "status": "success",
+            "message": "History found",
+            "dataHistoryById": [
+                {
+                    "id_pred": 3422,
+                    "prediction": "Corn Common Rust",
+                    "confidence": 100,
+                    "description": "Common Rust is caused by Puccinia sorghi and appears as raised, brick-red pustules on leaves, reducing photosynthesis.",
+                    "solution": "Use resistant varieties, apply fungicides early, and maintain proper plant spacing.",
+                    "user_id": "bm7kf1vf"
+                }
+            ]
+        }
+        ```
+- **Response Error:**
+    - **Status Code:** 400 Bad Request
+    - **Body:**
+        ```json
+        {
+            "status": "failed",
+            "message": "Deskripsi kesalahan atau pesan error"
+        }
+        ```
+
+---
+
+### **11. Mendapatkan Riwayat Berdasarkan User ID**
+- **Endpoint:** `/history/users/:user_id`
+- **Metode:** `GET`
+- **Deskripsi:** Mengambil semua data riwayat yang dibuat oleh pengguna tertentu berdasarkan `user_id`.
+- **Format Request:**
+    - **Content-Type:** `application/json`
+    - **Headers:** `Authorization: Bearer <token>`
+- **Response Berhasil:**
+    - **Status Code:** 200 OK
+    - **Body:**
+        ```json
+        {
+            "status": "success",
+            "message": "History found",
+            "dataHistoryUser": []
+        }
+        ```
+- **Response Error:**
+    - **Status Code:** 400 Bad Request
+    - **Body:**
+        ```json
+        {
+            "status": "failed",
+            "message": "Deskripsi kesalahan atau pesan error"
+        }
+        ```
+
+---
+
+### **12. Menghapus Data Riwayat Berdasarkan ID Prediksi**
+- **Endpoint:** `/history/:id_pred`
+- **Metode:** `DELETE`
+- **Deskripsi:** Menghapus data riwayat berdasarkan `id_pred`. Setelah data dihapus, respons hanya mengembalikan pesan konfirmasi tanpa data tambahan.
+- **Format Request:**
+    - **Content-Type:** `application/json`
+    - **Headers:** `Authorization: Bearer <token>`
+- **Response Berhasil:**
+    - **Status Code:** 200 OK
+    - **Body:**
+        ```json
+        {
+            "status": "success",
+            "message": "History deleted successfully",
+            "dataDelete": {
+                "id_pred": "3422"
+            }
+        }
+        ```
+- **Response Error:**
+    - **Status Code:** 400 Bad Request
+    - **Body:**
+        ```json
+        {
+            "status": "failed",
+            "message": "Deskripsi kesalahan atau pesan error"
+        }
+        ```
+
+---
+
+### **Fitur Sharing**
+
+### **13. Menambahkan Postingan Baru dengan Teks dan Gambar**
 - **Endpoint:** `/sharing`
 - **Metode:** `POST`
-- **Deskripsi:** Membuat postingan baru dengan teks dan gambar.
+- **Deskripsi:** Membuat postingan baru dengan teks dan gambar dalam format JPG/PNG.
 - **Format Request:**
     - **Content-Type:** `multipart/form-data`
     - **Headers:** `Authorization: Bearer <token>`
@@ -276,7 +440,7 @@
         }
         ```
 - **Response Berhasil:**
-    - **Status Code:** 200 OK
+    - **Status Code:** 201 Created
     - **Body:**
         ```json
         {
@@ -286,7 +450,7 @@
                 "sharing_id": "sharing-cGzG",
                 "name": "test",
                 "content": "Testing a response sharing",
-                "imgUrl": "https://example.com/image.jpg"
+                "imgUrl": "https://imageexample.com"
             }
         }
         ```
@@ -296,16 +460,16 @@
         ```json
         {
             "status": "failed",
-            "message": "error.message"
+            "message": "Deskripsi kesalahan atau pesan error"
         }
         ```
 
 ---
 
-### **9. Mendapatkan Daftar Postingan**
+### **14. Mendapatkan Semua Daftar Sharing yang Telah Diposting**
 - **Endpoint:** `/sharing`
 - **Metode:** `GET`
-- **Deskripsi:** Mengambil daftar seluruh postingan yang telah dibuat, dengan opsi paginasi.
+- **Deskripsi:** Mengambil daftar seluruh postingan sharing yang telah dibuat, dengan opsi paginasi.
 - **Format Request:**
     - **Content-Type:** `application/json`
     - **Headers:** `Authorization: Bearer <token>`
@@ -317,10 +481,17 @@
         {
             "status": "success",
             "message": "Sharing content found",
-            "dataGetAll": [],
+            "dataGetAll": [
+                {
+                    "sharing_id": "sharing-cGzG",
+                    "name": "test",
+                    "content": "Testing a response sharing",
+                    "imgUrl": "https://imageexample.com"
+                }
+            ],
             "pagination": {
-                "totalItems": 0,
-                "totalPages": 0,
+                "totalItems": 1,
+                "totalPages": 1,
                 "currentPage": 1,
                 "itemsPerPage": 10
             }
@@ -332,10 +503,148 @@
         ```json
         {
             "status": "failed",
-            "message": "error.message"
+            "message": "Deskripsi kesalahan atau pesan error"
         }
         ```
 
 ---
 
-Dokumentasi ini memberikan gambaran yang jelas dan terstruktur tentang bagaimana mengakses dan menggunakan API. Setiap fitur disertai dengan contoh request dan response untuk mempermudah implementasi.
+### **15. Mendapatkan Informasi Sharing Berdasarkan ID**
+- **Endpoint:** `/sharing/:sharing_id`
+- **Metode:** `GET`
+- **Deskripsi:** Mengambil detail sebuah postingan berdasarkan `sharing_id`.
+- **Format Request:**
+    - **Content-Type:** `application/json`
+    - **Headers:** `Authorization: Bearer <token>`
+    - **Parameter:** `sharing_id`
+- **Response Berhasil:**
+    - **Status Code:** 200 OK
+    - **Body:**
+        ```json
+        {
+            "status": "success",
+            "message": "Sharing found",
+            "dataGetById": {
+                "sharing_id": "sharing-cGzG",
+                "name": "test",
+                "content": "Testing a response sharing",
+                "imgUrl": "https://imageexample.com"
+            }
+        }
+        ```
+- **Response Error:**
+    - **Status Code:** 400 Bad Request
+    - **Body:**
+        ```json
+        {
+            "status": "failed",
+            "message": "Deskripsi kesalahan atau pesan error"
+        }
+        ```
+
+---
+
+### **16. Mendapatkan Daftar Sharing yang Dibuat oleh Pengguna Tertentu**
+- **Endpoint:** `/sharing/users/:user_id`
+- **Metode:** `GET`
+- **Deskripsi:** Mengambil daftar postingan sharing yang dibuat oleh pengguna tertentu berdasarkan `user_id`.
+- **Format Request:**
+    - **Content-Type:** `application/json`
+    - **Headers:** `Authorization: Bearer <token>`
+    - **Parameter:** `user_id`
+- **Response Berhasil:**
+    - **Status Code:** 200 OK
+    - **Body:**
+        ```json
+        {
+            "status": "success",
+            "message": "Sharing content found",
+            "dataGetByUser": [
+                {
+                    "sharing_id": "sharing-cGzG",
+                    "name": "test",
+                    "content": "Testing a response sharing",
+                    "imgUrl": "https://imageexample.com"
+                }
+            ]
+        }
+        ```
+- **Response Error:**
+    - **Status Code:** 400 Bad Request
+    - **Body:**
+        ```json
+        {
+            "status": "failed",
+            "message": "Deskripsi kesalahan atau pesan error"
+        }
+        ```
+
+---
+
+### **17. Memperbarui Postingan Sharing yang Telah Dibuat oleh Pengguna**
+- **Endpoint:** `/sharing/:sharing_id`
+- **Metode:** `PUT`
+- **Deskripsi:** Memperbarui isi dari sebuah postingan berdasarkan `sharing_id`. Pengguna dapat mengubah teks dan/atau gambar. Jika `imgUrl` bernilai `null`, maka gambar tidak diperbarui.
+- **Format Request:**
+    - **Content-Type:** `multipart/form-data`
+    - **Headers:** `Authorization: Bearer <token>`
+    - **Parameter:** `sharing_id`
+    - **Body:**
+        ```json
+        {
+            "content": "Testing response update",
+            "imgUrl": null
+        }
+        ```
+- **Response Berhasil:**
+    - **Status Code:** 200 OK
+    - **Body:**
+        ```json
+        {
+            "status": "success",
+            "message": "Sharing updated successfully",
+            "dataUpdate": {
+                "sharing_id": "sharing-t0eU",
+                "content": "Testing response update",
+                "imgUrl": null
+            }
+        }
+        ```
+- **Response Error:**
+    - **Status Code:** 400 Bad Request
+    - **Body:**
+        ```json
+        {
+            "status": "failed",
+            "message": "Deskripsi kesalahan atau pesan error"
+        }
+        ```
+
+---
+
+### **18. Menghapus Postingan Sharing Berdasarkan ID**
+- **Endpoint:** `/sharing/:sharing_id`
+- **Metode:** `DELETE`
+- **Deskripsi:** Menghapus sebuah postingan berdasarkan `sharing_id`.
+- **Format Request:**
+    - **Content-Type:** `application/json`
+    - **Headers:** `Authorization: Bearer <token>`
+    - **Parameter:** `sharing_id`
+- **Response Berhasil:**
+    - **Status Code:** 200 OK
+    - **Body:**
+        ```json
+        {
+            "status": "success",
+            "message": "Sharing deleted successfully"
+        }
+        ```
+- **Response Error:**
+    - **Status Code:** 400 Bad Request
+    - **Body:**
+        ```json
+        {
+            "status": "failed",
+            "message": "Deskripsi kesalahan atau pesan error"
+        }
+        ```
